@@ -425,7 +425,7 @@ function ModuleModal({ module: m, onClose }: { module: CatalogModule; onClose: (
         style={{ width: 700, maxWidth: '100%', maxHeight: '90vh', background: C.white, borderRadius: 20, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
       >
         {/* ── Фиксированная шапка ── */}
-        <div style={{ flexShrink: 0, padding: '20px 28px 16px', borderBottom: `1px solid ${C.borderLight}`, display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative' }}>
+        <div style={{ flexShrink: 0, padding: '20px 24px 16px', borderBottom: `1px solid ${C.borderLight}`, display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative' }}>
           <button
             onClick={onClose}
             style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
@@ -444,7 +444,7 @@ function ModuleModal({ module: m, onClose }: { module: CatalogModule; onClose: (
         </div>
 
         {/* ── Скроллируемый контент ── */}
-        <div className="kit-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 8px 20px 28px' }}>
+        <div className="kit-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 24px 20px 24px' }}>
 
           {!m.connected && (
             <p style={{ ...font(14), color: C.textPrimary, lineHeight: 1.6, margin: '0 0 20px' }}>
@@ -650,8 +650,8 @@ function CatalogIsContent() {
 
   return (
     <>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 24px' }}>
-        <div style={{ ...font(14), color: C.textPrimary }}>Каталог ИС</div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 30, padding: '24px 24px' }}>
+        <h2 style={{ margin: 0, ...font(24, 500), color: C.textPrimary }}>Сервисы для добавления в экосистему Praktis</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
           {CATALOG_MODULES.map(m => (
             <CatalogIsCard key={m.id} module={m} onOpen={() => setActiveModule(m)} />
