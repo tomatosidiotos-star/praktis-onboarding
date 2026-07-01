@@ -36,6 +36,8 @@ const C = {
   borderDefault: '#dddddd',
   borderLight:   '#eef3f9',
   buttonSecondary: '#eef3f9',
+  successBg:     '#ebfddc',
+  successText:   '#72bf2f',
 };
 
 const R = { sm: 6, md: 8, lg: 12 };
@@ -47,7 +49,7 @@ const font = (size: number, weight: 400 | 500 | 600 = 400): React.CSSProperties 
   lineHeight: 1.2,
 });
 
-// ─── Иконки (из OnboardingFlow) ───────────────────────────────────────────────
+// ─── Иконки ───────────────────────────────────────────────────────────────────
 
 function IconNotification({ color, size = 24 }: { color: string; size?: number }) {
   return (
@@ -132,7 +134,7 @@ function DropdownItem({
   );
 }
 
-// ─── Header (из OnboardingFlow, адаптирован для workspace) ───────────────────
+// ─── Header ───────────────────────────────────────────────────────────────────
 
 function WorkspaceHeader({ user }: { user: CurrentUser | null }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -258,7 +260,7 @@ function WorkspaceHeader({ user }: { user: CurrentUser | null }) {
   );
 }
 
-// ─── Footer (из OnboardingFlow) ───────────────────────────────────────────────
+// ─── Footer ───────────────────────────────────────────────────────────────────
 
 function WorkspaceFooter() {
   return (
@@ -277,7 +279,7 @@ function WorkspaceFooter() {
   );
 }
 
-// ─── Данные ───────────────────────────────────────────────────────────────────
+// ─── Данные витрины ───────────────────────────────────────────────────────────
 
 const SERVICES = [
   { id: 'mc',      name: 'Моя компания', img: imgMiMc      },
@@ -291,84 +293,92 @@ const SERVICES = [
   { id: 'pir',     name: 'ПИР',          img: imgMiPir     },
 ];
 
-const NAV_ITEMS: { id: string; label: string; icon: string; badge?: string; spotlight?: true }[] = [
-  { id: 'showcase',          label: 'Витрина сервисов',     icon: navShowcase  },
-  { id: 'profile',           label: 'Профиль компании',     icon: navProfile   },
-  { id: 'catalog-companies', label: 'Каталог компаний',     icon: navCompanies },
-  { id: 'catalog-users',     label: 'Каталог пользователей',icon: navUsers     },
-  { id: 'catalog-roles',     label: 'Каталог ролей',        icon: navRoles     },
-  { id: 'catalog-is',        label: 'Каталог ИС',           icon: navCatalogIs, spotlight: true },
-  { id: 'requests',          label: 'Заявки',               icon: navRequests,  badge: '15+' },
-  { id: 'billing',           label: 'Биллинг',              icon: navBilling   },
+// ─── Данные каталога ИС ───────────────────────────────────────────────────────
+
+const CATALOG_MODULES = [
+  {
+    id: 'objects',
+    name: 'Объекты',
+    desc: 'Сервис предоставляет пользователям информацию об объектах строительства.',
+    img: imgMiObjects,
+    connected: true,
+  },
+  {
+    id: 'refs',
+    name: 'Справочники',
+    desc: 'Сервис предоставляет пользователям доступ к централизованным справочникам и классификаторам.',
+    img: imgMiRefs,
+    connected: true,
+  },
+  {
+    id: 'lkk',
+    name: 'ЛКК',
+    desc: 'Личный кабинет клиента — инструмент для управления договорами и взаимодействия с застройщиком.',
+    img: imgMiLkk,
+    connected: false,
+  },
+  {
+    id: 'ks',
+    name: 'КС',
+    desc: 'Сервис для управления контрольными структурами и согласования документации.',
+    img: imgMiKs,
+    connected: true,
+  },
+  {
+    id: 'mc',
+    name: 'Моя компания',
+    desc: 'Управление профилем компании, структурой и настройками организации.',
+    img: imgMiMc,
+    connected: true,
+  },
+  {
+    id: 'id',
+    name: 'ИД',
+    desc: 'Исполнительная документация — хранение и управление строительной документацией.',
+    img: imgMiId,
+    connected: true,
+  },
+  {
+    id: 'etp',
+    name: 'ЭТП',
+    desc: 'Электронная торговая площадка для проведения закупочных процедур.',
+    img: imgMiEtp,
+    connected: false,
+  },
 ];
 
-// ─── Spotlight tooltip ────────────────────────────────────────────────────────
+// ─── Навигация ────────────────────────────────────────────────────────────────
 
-function SpotlightTooltip({ targetRef, onClose }: {
-  targetRef: React.RefObject<HTMLDivElement | null>;
-  onClose: () => void;
-}) {
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+type NavTab = 'showcase' | 'catalog-is';
 
-  useEffect(() => {
-    if (!targetRef.current) return;
-    const update = () => {
-      const r = targetRef.current!.getBoundingClientRect();
-      setPos({ top: r.top + r.height / 2, left: r.right + 16 });
-    };
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
-  }, [targetRef]);
-
-  if (!pos) return null;
-  return (
-    <div style={{
-      position: 'fixed', top: pos.top - 48, left: pos.left, zIndex: 1002,
-      background: C.white, borderRadius: 12, padding: '16px 20px', width: 300,
-      boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
-      display: 'flex', flexDirection: 'column', gap: 16,
-    }}>
-      <div style={{
-        position: 'absolute', left: -8, top: 40,
-        width: 0, height: 0,
-        borderTop: '8px solid transparent',
-        borderBottom: '8px solid transparent',
-        borderRight: `8px solid ${C.white}`,
-      }} />
-      <p style={{ ...font(14), color: C.textPrimary, margin: 0, lineHeight: 1.5 }}>
-        Для получения доступа к модулям перейдите в пункт меню <strong>«Каталог ИС»</strong>
-      </p>
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <button
-          onClick={onClose}
-          style={{ ...font(14, 500), color: C.primary, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-        >
-          Понятно →
-        </button>
-      </div>
-    </div>
-  );
-}
+const NAV_ITEMS: { id: string; label: string; icon: string; badge?: string; clickable?: NavTab }[] = [
+  { id: 'showcase',          label: 'Витрина сервисов',      icon: navShowcase,  clickable: 'showcase'   },
+  { id: 'profile',           label: 'Профиль компании',      icon: navProfile   },
+  { id: 'catalog-companies', label: 'Каталог компаний',      icon: navCompanies },
+  { id: 'catalog-users',     label: 'Каталог пользователей', icon: navUsers     },
+  { id: 'catalog-roles',     label: 'Каталог ролей',         icon: navRoles     },
+  { id: 'catalog-is',        label: 'Каталог ИС',            icon: navCatalogIs, clickable: 'catalog-is' },
+  { id: 'requests',          label: 'Заявки',                icon: navRequests,  badge: '15+' },
+  { id: 'billing',           label: 'Биллинг',               icon: navBilling   },
+];
 
 // ─── WorkspacePage ────────────────────────────────────────────────────────────
 
-export default function WorkspacePage() {
-  const [tourActive, setTourActive] = useState(true);
+export default function WorkspacePage({ initialTab = 'showcase' }: { initialTab?: NavTab }) {
+  const [activeTab, setActiveTab] = useState<NavTab>(initialTab);
   const [user, setUser] = useState<CurrentUser>({
     fullName: 'Лаврентьев Александр',
     email: 'a.lavrentyev@setltech.ru',
     initials: 'ЛА',
     companyName: 'ООО "Сетл Тех"',
   });
-  const catalogIsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     api.getCurrentUser().then(u => setUser({ ...u, companyName: 'ООО "Сетл Тех"' }));
   }, []);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: C.bgPage, position: 'relative' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: C.bgPage }}>
 
       {/* ── Sidebar ── */}
       <div style={{
@@ -387,19 +397,16 @@ export default function WorkspacePage() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
           {NAV_ITEMS.map(item => {
-            const isActive = item.id === 'showcase';
-            const isSpot   = item.spotlight && tourActive;
+            const isActive = item.clickable === activeTab;
             return (
               <div
                 key={item.id}
-                ref={item.spotlight ? catalogIsRef : undefined}
+                onClick={item.clickable ? () => setActiveTab(item.clickable!) : undefined}
                 style={{
                   padding: '6px 12px', borderRadius: 6,
                   background: isActive ? C.primaryLight : C.white,
                   display: 'flex', alignItems: 'center', gap: 8,
-                  minHeight: 46, cursor: 'pointer', position: 'relative',
-                  zIndex: isSpot ? 1001 : undefined,
-                  boxShadow: isSpot ? '0 0 0 9999px rgba(0,0,0,0.55)' : undefined,
+                  minHeight: 46, cursor: item.clickable ? 'pointer' : 'default',
                 }}
               >
                 <img src={item.icon} alt="" style={{ width: 16, height: 16, flexShrink: 0, objectFit: 'contain' }} />
@@ -420,46 +427,119 @@ export default function WorkspacePage() {
       {/* ── Правая колонка ── */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
 
-        {/* Header — sticky сверху */}
         <WorkspaceHeader user={user} />
 
-        {/* Контент */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 8px' }}>
+        {activeTab === 'showcase' ? (
+          <ShowcaseContent />
+        ) : (
+          <CatalogIsContent />
+        )}
 
-          {/* Title block */}
-          <div style={{ background: C.white, borderRadius: 20, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-            <h2 style={{ margin: 0, ...font(24, 500), color: C.textPrimary }}>Витрина сервисов</h2>
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button style={{ height: 36, padding: '0 16px', background: C.buttonSecondary, border: 'none', borderRadius: 6, cursor: 'pointer', ...font(14), color: C.textPrimary }}>+ Создать группу</button>
-              <button style={{ height: 36, padding: '0 16px', background: C.primary, border: 'none', borderRadius: 6, cursor: 'pointer', ...font(14), color: C.white }}>Редактировать</button>
-            </div>
-          </div>
-
-          {/* Services grid */}
-          <div style={{ background: C.white, borderRadius: 20, padding: 24 }}>
-            <h3 style={{ margin: '0 0 24px', ...font(20, 500), color: C.textPrimary }}>Основные системы</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))', gap: 12 }}>
-              {SERVICES.map(s => (
-                <div
-                  key={s.id}
-                  style={{ height: 180, background: C.bgPage, borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '24px 12px', cursor: 'pointer' }}
-                >
-                  <img src={s.img} alt={s.name} style={{ width: 75, height: 75, objectFit: 'contain' }} />
-                  <span style={{ ...font(16, 500), color: C.textPrimary, textAlign: 'center' }}>{s.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Footer — прижат к низу */}
         <WorkspaceFooter />
       </div>
+    </div>
+  );
+}
 
-      {/* ── Spotlight tooltip ── */}
-      {tourActive && (
-        <SpotlightTooltip targetRef={catalogIsRef} onClose={() => setTourActive(false)} />
-      )}
+// ─── Витрина сервисов ─────────────────────────────────────────────────────────
+
+function ShowcaseContent() {
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12, padding: '12px 8px' }}>
+      <div style={{ background: C.white, borderRadius: 20, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <h2 style={{ margin: 0, ...font(24, 500), color: C.textPrimary }}>Витрина сервисов</h2>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button style={{ height: 36, padding: '0 16px', background: C.buttonSecondary, border: 'none', borderRadius: 6, cursor: 'pointer', ...font(14), color: C.textPrimary }}>+ Создать группу</button>
+          <button style={{ height: 36, padding: '0 16px', background: C.primary, border: 'none', borderRadius: 6, cursor: 'pointer', ...font(14), color: C.white }}>Редактировать</button>
+        </div>
+      </div>
+
+      <div style={{ background: C.white, borderRadius: 20, padding: 24 }}>
+        <h3 style={{ margin: '0 0 24px', ...font(20, 500), color: C.textPrimary }}>Основные системы</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))', gap: 12 }}>
+          {SERVICES.map(s => (
+            <div
+              key={s.id}
+              style={{ height: 180, background: C.bgPage, borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '24px 12px', cursor: 'pointer' }}
+            >
+              <img src={s.img} alt={s.name} style={{ width: 75, height: 75, objectFit: 'contain' }} />
+              <span style={{ ...font(16, 500), color: C.textPrimary, textAlign: 'center' }}>{s.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Каталог ИС ───────────────────────────────────────────────────────────────
+
+function CatalogIsContent() {
+  return (
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 24px' }}>
+      <div style={{ ...font(14), color: C.textPrimary }}>Каталог ИС</div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignContent: 'flex-start' }}>
+        {CATALOG_MODULES.map(m => (
+          <div
+            key={m.id}
+            style={{
+              flex: '1 0 0',
+              minWidth: 380,
+              maxWidth: 700,
+              background: C.white,
+              borderRadius: 20,
+              padding: 20,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 16,
+              boxSizing: 'border-box',
+            }}
+          >
+            <div style={{ flexShrink: 0 }}>
+              <img src={m.img} alt={m.name} style={{ width: 138, height: 138, objectFit: 'contain', display: 'block' }} />
+            </div>
+
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ ...font(20, 500), color: m.connected ? C.textPrimary : C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {m.name}
+                </div>
+                <div style={{ ...font(14), color: m.connected ? C.textPrimary : C.textMuted, lineHeight: 1.4 }}>
+                  {m.desc}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 20 }}>
+                <button style={{
+                  flex: 1, height: 36, background: C.buttonSecondary,
+                  border: 'none', borderRadius: R.sm, cursor: 'pointer',
+                  ...font(14), color: C.textPrimary,
+                }}>
+                  Подробнее
+                </button>
+                {m.connected ? (
+                  <button style={{
+                    flex: 1, height: 36, background: C.successBg,
+                    border: 'none', borderRadius: R.sm, cursor: 'pointer',
+                    ...font(14), color: C.successText,
+                  }}>
+                    Подключено
+                  </button>
+                ) : (
+                  <button style={{
+                    flex: 1, height: 36, background: C.primary,
+                    border: 'none', borderRadius: R.sm, cursor: 'pointer',
+                    ...font(14), color: C.white,
+                  }}>
+                    Подключить
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1316,7 +1316,7 @@ function ScreenJoinRequestSent({ companyNames, onViewModules }: {
       </div>
 
       <PrimaryButton onClick={onViewModules}>
-        Посмотреть, что входит в Praktis, пока ждёте →
+        Приступить к работе
       </PrimaryButton>
     </ScreenCard>
   );
@@ -1606,7 +1606,7 @@ function ScreenCompanyCreated({ companyNames, onViewModules }: {
       </div>
 
       <PrimaryButton onClick={onViewModules}>
-        Перейти к рабочему столу →
+        Приступить к работе
       </PrimaryButton>
     </ScreenCard>
   );
@@ -1790,7 +1790,7 @@ export default function OnboardingFlow({
    * Вызывается когда онбординг завершён.
    * TODO: передать сюда навигацию — напр. navigate('/') или router.push('/')
    */
-  onComplete: () => void;
+  onComplete: (tab: 'showcase' | 'catalog-is') => void;
 }) {
   const [step, setStep] = useState<OnboardingStep>('entry');
   const [user, setUser] = useState<CurrentUser | null>(null);
@@ -1875,7 +1875,7 @@ export default function OnboardingFlow({
         return (
           <ScreenJoinRequestSent
             companyNames={joinRequestCompanyNames.length > 0 ? joinRequestCompanyNames : ['вашей компании']}
-            onViewModules={() => setStep('final')}
+            onViewModules={() => onComplete('catalog-is')}
           />
         );
 
@@ -1908,7 +1908,7 @@ export default function OnboardingFlow({
         return (
           <ScreenCompanyCreated
             companyNames={createdCompanyNames.length > 0 ? createdCompanyNames : ['ООО Демо']}
-            onViewModules={onComplete}
+            onViewModules={() => onComplete('catalog-is')}
           />
         );
 
