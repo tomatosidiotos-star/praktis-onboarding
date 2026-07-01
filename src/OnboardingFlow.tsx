@@ -7,7 +7,7 @@ import imgMiRefs     from './mi-refs.png';
 import imgMiLkk      from './mi-lkk.png';
 import imgMiKs       from './mi-ks.png';
 import imgMiMc       from './mi-mc.png';
-import imgMiIcona    from './mi-icona.svg';
+import imgMiIcona    from './mi-icona.png';
 import imgMiId       from './mi-id.png';
 import imgMiEtp      from './mi-etp.png';
 import imgMiPir      from './mi-pir.png';
@@ -1315,9 +1315,21 @@ function ScreenJoinRequestSent({ companyNames, onViewModules }: {
         На рассмотрении
       </div>
 
-      <PrimaryButton onClick={onViewModules}>
-        Приступить к работе
-      </PrimaryButton>
+      <button
+        onClick={onViewModules}
+        style={{
+          height: 36, padding: '0 20px',
+          background: '#eef3f9', color: '#41484a',
+          border: 'none', borderRadius: 6,
+          cursor: 'pointer', fontSize: 14, fontFamily: "'Inter', sans-serif",
+          display: 'inline-flex', alignItems: 'center', gap: 8,
+        }}
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path fillRule="evenodd" clipRule="evenodd" d="M8 1.5C4.41 1.5 1.5 4.41 1.5 8C1.5 11.59 4.41 14.5 8 14.5C11.59 14.5 14.5 11.59 14.5 8C14.5 4.41 11.59 1.5 8 1.5ZM0.5 8C0.5 3.86 3.86 0.5 8 0.5C12.14 0.5 15.5 3.86 15.5 8C15.5 12.14 12.14 15.5 8 15.5C3.86 15.5 0.5 12.14 0.5 8ZM8 4.5C8.28 4.5 8.5 4.72 8.5 5V7.5H11C11.28 7.5 11.5 7.72 11.5 8C11.5 8.28 11.28 8.5 11 8.5H8C7.72 8.5 7.5 8.28 7.5 8V5C7.5 4.72 7.72 4.5 8 4.5Z" fill="#66788c"/>
+        </svg>
+        Обновить статус
+      </button>
     </ScreenCard>
   );
 }

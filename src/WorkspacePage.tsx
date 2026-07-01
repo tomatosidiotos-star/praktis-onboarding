@@ -17,7 +17,7 @@ import imgMiRefs    from './mi-refs.png';
 import imgMiLkk     from './mi-lkk.png';
 import imgMiKs      from './mi-ks.png';
 import imgMiMc      from './mi-mc.png';
-import imgMiIcona   from './mi-icona.svg';
+import imgMiIcona   from './mi-icona.png';
 import imgMiId      from './mi-id.png';
 import imgMiEtp     from './mi-etp.png';
 import imgMiPir     from './mi-pir.png';
@@ -409,7 +409,16 @@ export default function WorkspacePage({ initialTab = 'showcase' }: { initialTab?
                   minHeight: 46, cursor: item.clickable ? 'pointer' : 'default',
                 }}
               >
-                <img src={item.icon} alt="" style={{ width: 16, height: 16, flexShrink: 0, objectFit: 'contain' }} />
+                <img
+                  src={item.icon}
+                  alt=""
+                  style={{
+                    width: 16, height: 16, flexShrink: 0, objectFit: 'contain',
+                    filter: isActive
+                      ? 'brightness(0) saturate(100%) invert(44%) sepia(60%) saturate(600%) hue-rotate(196deg) brightness(106%)'
+                      : 'brightness(0)',
+                  }}
+                />
                 <span style={{ ...font(14, 500), color: isActive ? C.primary : C.textPrimary, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {item.label}
                 </span>
@@ -479,7 +488,7 @@ function CatalogIsContent() {
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 24px' }}>
       <div style={{ ...font(14), color: C.textPrimary }}>Каталог ИС</div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignContent: 'flex-start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
         {CATALOG_MODULES.map(m => (
           <div
             key={m.id}
