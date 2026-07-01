@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import type { OnboardingStep, CurrentUser, MchdVerifyResult, UkepVerifyResult, PlatformModule } from './types';
 import * as api from './api';
 import logoUrl from './logo.svg';
+import iconTick      from './icon-tick.svg';
 import imgMiObjects  from './mi-objects.png';
 import imgMiRefs     from './mi-refs.png';
 import imgMiLkk      from './mi-lkk.png';
@@ -73,22 +74,31 @@ function PrimaryButton({
   loading?: boolean;
   style?: React.CSSProperties;
 }) {
+  const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const isOff = disabled || loading;
+  const bg = isOff ? '#c5d8fd' : pressed ? '#0958d9' : hovered ? '#1a68e8' : '#3c83f6';
   return (
     <button
       onClick={onClick}
-      disabled={disabled || loading}
+      disabled={isOff}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setPressed(false); }}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
       style={{
         height: 36,
         padding: '0 16px',
-        background: disabled || loading ? '#c5d8fd' : C.primary,
+        background: bg,
         color: C.white,
         border: 'none',
         borderRadius: R.sm,
-        cursor: disabled || loading ? 'not-allowed' : 'pointer',
+        cursor: isOff ? 'not-allowed' : 'pointer',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
+        transition: 'background 0.12s',
         ...font(14),
         ...style,
       }}
@@ -110,14 +120,21 @@ function SecondaryButton({
   disabled?: boolean;
   style?: React.CSSProperties;
 }) {
+  const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  const bg = disabled ? '#f5f5f5' : pressed ? '#c6d4e1' : hovered ? '#d5e0eb' : '#eef3f9';
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setPressed(false); }}
+      onMouseDown={() => setPressed(true)}
+      onMouseUp={() => setPressed(false)}
       style={{
         height: 36,
         padding: '0 16px',
-        background: disabled ? '#f5f5f5' : C.buttonSecondary,
+        background: bg,
         color: disabled ? '#b8b8b8' : C.textPrimary,
         border: 'none',
         borderRadius: R.sm,
@@ -126,6 +143,7 @@ function SecondaryButton({
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
+        transition: 'background 0.12s',
         ...font(14),
         ...style,
       }}
@@ -892,14 +910,38 @@ function ScreenSubtitle({ children, style }: { children: React.ReactNode; style?
 function ScreenEntry({ onJoin, onCreate }: { onJoin: () => void; onCreate: () => void }) {
   return (
     <ScreenCard>
-      <div>
-        <ScreenTitle>Один шаг до начала работы</ScreenTitle>
-        <ScreenSubtitle style={{ marginTop: 8 }}>
-          Praktis объединяет сервисы для всех этапов стройки — от тендеров до сдачи объекта.
-          Чтобы продолжить, скажите, как вы будете работать в системе.
-        </ScreenSubtitle>
+      {/* Описание экосистемы */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div>
+          <div style={{ ...font(11, 500), color: C.primary, letterSpacing: '0.08em', textTransform: 'uppercase' as const, marginBottom: 10 }}>
+            Praktis · Единая экосистема стройки
+          </div>
+          <ScreenTitle style={{ fontSize: 22 }}>Все участники стройки — в одной системе</ScreenTitle>
+          <ScreenSubtitle style={{ marginTop: 8 }}>
+            Praktis объединяет застройщиков, поставщиков и подрядчиков в едином пространстве: тендеры и закупки, планирование, строительство, актирование и документы. Один вход во все сервисы.
+          </ScreenSubtitle>
+        </div>
+
+        <div style={{ display: 'flex', gap: 12 }}>
+          {[
+            { dot: '#3c83f6', role: 'Застройщик',  desc: 'Тендеры, планирование, актирование, приёмка и передача объекта' },
+            { dot: '#72bf2f', role: 'Поставщик',   desc: 'Участие в закупках и торгах, аккредитация, работа с контрактами' },
+            { dot: '#ed7803', role: 'Подрядчик',   desc: 'Ведение работ, исполнительная документация, акты и КС-формы' },
+          ].map(({ dot, role, desc }) => (
+            <div key={role} style={{ flex: 1, background: C.bgPage, borderRadius: R.md, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ width: 8, height: 8, borderRadius: '50%', background: dot, flexShrink: 0 }} />
+                <span style={{ ...font(14, 500), color: C.textPrimary }}>{role}</span>
+              </div>
+              <span style={{ ...font(13), color: C.textSecondary, lineHeight: 1.5 }}>{desc}</span>
+            </div>
+          ))}
+        </div>
+
+        <ScreenSubtitle>Чтобы начать, скажите, как вы будете работать в системе.</ScreenSubtitle>
       </div>
 
+      {/* Кнопки выбора пути */}
       <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
         <SelectionCard
           icon={(c) => <IconBuilding color={c} size={32} />}
@@ -913,22 +955,6 @@ function ScreenEntry({ onJoin, onCreate }: { onJoin: () => void; onCreate: () =>
           description="Зарегистрируйте свою компанию в Praktis и станьте её администратором"
           onClick={onCreate}
         />
-      </div>
-
-      <div style={{ textAlign: 'center' }}>
-        {/* TODO: реализовать демо-режим — ограниченный доступ без аккредитации */}
-        <button
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: C.textSecondary,
-            ...font(13),
-          }}
-          onClick={() => { /* TODO: перейти в демо */ }}
-        >
-          Пропустить, посмотреть демо-режим
-        </button>
       </div>
     </ScreenCard>
   );
@@ -1594,16 +1620,17 @@ function ScreenSelectCompany<T extends { companyName: string; inn: string }>({
   );
 }
 
-function ScreenCompanyCreated({ companyNames, onViewModules }: {
+function ScreenCompanyCreated({ companyNames, onInvite, onViewModules }: {
   companyNames: string[];
+  onInvite: () => void;
   onViewModules: () => void;
 }) {
   const plural = companyNames.length > 1;
   return (
-    <ScreenCard style={{ alignItems: 'center', textAlign: 'center', paddingTop: 56, paddingBottom: 56 }}>
-      <IconDiamond color={C.primary} size={48} />
-      <ScreenTitle>{plural ? 'Компании зарегистрированы' : 'Компания зарегистрирована'}</ScreenTitle>
-      <div style={{ maxWidth: 480 }}>
+    <ScreenCard style={{ paddingTop: 48, paddingBottom: 48 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 8 }}>
+        <IconDiamond color={C.primary} size={48} />
+        <ScreenTitle>{plural ? 'Компании зарегистрированы' : 'Компания зарегистрирована'}</ScreenTitle>
         <ScreenSubtitle>
           Вы стали администратором {plural ? 'компаний' : 'компании'}{' '}
           {companyNames.map((name, i) => (
@@ -1611,12 +1638,142 @@ function ScreenCompanyCreated({ companyNames, onViewModules }: {
               <strong style={{ color: C.textPrimary }}>«{name}»</strong>
               {i < companyNames.length - 1 ? ', ' : ''}
             </React.Fragment>
-          ))}{' '}
-          — это можно изменить позже в настройках. Теперь вы можете пригласить сотрудников,
-          добавить дополнительные компании и настроить рабочий стол.
+          ))}
         </ScreenSubtitle>
       </div>
 
+      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <SelectionCard
+          icon={(c) => (
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M21.333 28v-2.667A5.333 5.333 0 0 0 16 20H6.667a5.333 5.333 0 0 0-5.334 5.333V28" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <circle cx="11.333" cy="12" r="5.333" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M30.667 28v-2.667a5.333 5.333 0 0 0-4-5.16M22 4.173a5.333 5.333 0 0 1 0 10.32" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
+          title="Пригласите сотрудников"
+          description="Сразу добавьте коллег — им придёт приглашение на почту"
+          onClick={onInvite}
+        />
+        <SelectionCard
+          icon={(c) => (
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M16 2.667L4 9.333v13.334L16 29.333l12-6.666V9.333L16 2.667Z" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M16 2.667v26.666M4 9.333l12 6.667 12-6.667" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
+          title="Приступить к работе"
+          description="Добавить сотрудников и настроить доступы вы сможете позже в сервисе"
+          onClick={onViewModules}
+        />
+      </div>
+    </ScreenCard>
+  );
+}
+
+function ScreenInviteEmployees({ onBack, onSend }: {
+  onBack: () => void;
+  onSend: () => void;
+}) {
+  const [emails, setEmails] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState('');
+  const [inputError, setInputError] = useState(false);
+
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+  const addEmail = () => {
+    const val = inputValue.trim();
+    if (!val) return;
+    if (!isValidEmail(val)) { setInputError(true); return; }
+    if (!emails.includes(val)) setEmails(prev => [...prev, val]);
+    setInputValue('');
+    setInputError(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' || e.key === 'Tab' || e.key === ',') {
+      e.preventDefault();
+      addEmail();
+    }
+    if (e.key === 'Backspace' && inputValue === '' && emails.length > 0) {
+      setEmails(prev => prev.slice(0, -1));
+    }
+  };
+
+  const removeEmail = (email: string) => setEmails(prev => prev.filter(e => e !== email));
+
+  return (
+    <ScreenCard>
+      <BackLink onClick={onBack} />
+
+      <div>
+        <ScreenTitle>Добавьте сотрудников в компанию</ScreenTitle>
+        <ScreenSubtitle style={{ marginTop: 8 }}>
+          Введите email-адреса сотрудников — каждый получит приглашение на почту.
+        </ScreenSubtitle>
+      </div>
+
+      {/* Поле ввода с чипами */}
+      <div
+        style={{
+          border: `1.5px solid ${inputError ? '#e55b54' : C.borderDefault}`,
+          borderRadius: R.md,
+          padding: '10px 12px',
+          display: 'flex',
+          flexWrap: 'wrap' as const,
+          gap: 8,
+          minHeight: 52,
+          cursor: 'text',
+          background: C.white,
+        }}
+        onClick={() => { const el = document.getElementById('email-input'); el?.focus(); }}
+      >
+        {emails.map(email => (
+          <div key={email} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: C.primaryLight, borderRadius: 4, padding: '2px 8px 2px 10px', ...font(13), color: C.primary }}>
+            {email}
+            <button
+              onClick={(e) => { e.stopPropagation(); removeEmail(email); }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: C.primary, opacity: 0.7 }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M9 3L3 9M3 3L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+            </button>
+          </div>
+        ))}
+        <input
+          id="email-input"
+          value={inputValue}
+          onChange={e => { setInputValue(e.target.value); setInputError(false); }}
+          onKeyDown={handleKeyDown}
+          onBlur={addEmail}
+          placeholder={emails.length === 0 ? 'Введите email и нажмите Enter' : ''}
+          style={{ border: 'none', outline: 'none', ...font(14), color: C.textPrimary, background: 'transparent', minWidth: 200, flex: 1 }}
+        />
+      </div>
+      {inputError && (
+        <p style={{ ...font(12), color: '#e55b54', margin: '-16px 0 0' }}>Введите корректный email-адрес</p>
+      )}
+
+      <PrimaryButton onClick={onSend} disabled={emails.length === 0} style={{ alignSelf: 'flex-start' }}>
+        Отправить приглашения
+      </PrimaryButton>
+    </ScreenCard>
+  );
+}
+
+function ScreenEmployeesAdded({ onViewModules }: { onViewModules: () => void }) {
+  return (
+    <ScreenCard style={{ alignItems: 'center', textAlign: 'center', paddingTop: 56, paddingBottom: 56 }}>
+      <div style={{ width: 56, height: 56, borderRadius: '50%', background: C.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <img src={iconTick} alt="" style={{ width: 24, height: 24 }} />
+      </div>
+      <ScreenTitle>Сотрудники успешно добавлены!</ScreenTitle>
+      <div style={{ maxWidth: 420 }}>
+        <ScreenSubtitle>
+          Вы можете изменить список сотрудников, настроить роли и доступы к сервисам в приложении.
+        </ScreenSubtitle>
+      </div>
       <PrimaryButton onClick={onViewModules}>
         Приступить к работе
       </PrimaryButton>
@@ -1920,6 +2077,22 @@ export default function OnboardingFlow({
         return (
           <ScreenCompanyCreated
             companyNames={createdCompanyNames.length > 0 ? createdCompanyNames : ['ООО Демо']}
+            onInvite={() => setStep('path-b-invite')}
+            onViewModules={() => onComplete('catalog-is')}
+          />
+        );
+
+      case 'path-b-invite':
+        return (
+          <ScreenInviteEmployees
+            onBack={() => setStep('path-b-created')}
+            onSend={() => setStep('path-b-invited')}
+          />
+        );
+
+      case 'path-b-invited':
+        return (
+          <ScreenEmployeesAdded
             onViewModules={() => onComplete('catalog-is')}
           />
         );

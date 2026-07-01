@@ -7,6 +7,8 @@ export type OnboardingStep =
   | 'path-b-upload-ukep'
   | 'path-b-select-company'
   | 'path-b-created'
+  | 'path-b-invite'
+  | 'path-b-invited'
   | 'final';
 
 export interface CurrentUser {

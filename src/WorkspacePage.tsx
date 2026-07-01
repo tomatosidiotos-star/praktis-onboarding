@@ -25,19 +25,19 @@ import imgMiPir     from './mi-pir.png';
 // ─── Токены ──────────────────────────────────────────────────────────────────
 
 const C = {
-  bgPage:        '#f5f8fb',
-  white:         '#ffffff',
-  primary:       '#3c83f6',
-  primaryLight:  '#eff5fe',
-  textPrimary:   '#41484a',
-  textSecondary: '#66788c',
-  textMuted:     '#7e7e7e',
-  avatarBg:      '#aabcce',
-  borderDefault: '#dddddd',
-  borderLight:   '#eef3f9',
+  bgPage:          '#f5f8fb',
+  white:           '#ffffff',
+  primary:         '#3c83f6',
+  primaryLight:    '#eff5fe',
+  textPrimary:     '#41484a',
+  textSecondary:   '#66788c',
+  textMuted:       '#7e7e7e',
+  avatarBg:        '#aabcce',
+  borderDefault:   '#dddddd',
+  borderLight:     '#eef3f9',
   buttonSecondary: '#eef3f9',
-  successBg:     '#ebfddc',
-  successText:   '#72bf2f',
+  successBg:       '#ebfddc',
+  successText:     '#72bf2f',
 };
 
 const R = { sm: 6, md: 8, lg: 12 };
@@ -48,6 +48,56 @@ const font = (size: number, weight: 400 | 500 | 600 = 400): React.CSSProperties 
   fontWeight: weight,
   lineHeight: 1.2,
 });
+
+// ─── Кнопки (токены из Figma UI-kit, node 57-2137) ───────────────────────────
+
+function BtnPrimary({ children, onClick, disabled, style }: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}) {
+  const [hov, setHov] = React.useState(false);
+  const [prs, setPrs] = React.useState(false);
+  const bg = disabled ? '#c5d8fd' : prs ? '#0958d9' : hov ? '#1a68e8' : '#3c83f6';
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => { setHov(false); setPrs(false); }}
+      onMouseDown={() => setPrs(true)}
+      onMouseUp={() => setPrs(false)}
+      style={{ height: 36, padding: '0 16px', background: bg, color: C.white, border: 'none', borderRadius: R.sm, cursor: disabled ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.12s', ...font(14), ...style }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BtnSecondary({ children, onClick, disabled, style }: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+  style?: React.CSSProperties;
+}) {
+  const [hov, setHov] = React.useState(false);
+  const [prs, setPrs] = React.useState(false);
+  const bg = disabled ? '#f5f5f5' : prs ? '#c6d4e1' : hov ? '#d5e0eb' : '#eef3f9';
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => { setHov(false); setPrs(false); }}
+      onMouseDown={() => setPrs(true)}
+      onMouseUp={() => setPrs(false)}
+      style={{ height: 36, padding: '0 16px', background: bg, color: disabled ? '#b8b8b8' : C.textPrimary, border: 'none', borderRadius: R.sm, cursor: disabled ? 'not-allowed' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, transition: 'background 0.12s', ...font(14), ...style }}
+    >
+      {children}
+    </button>
+  );
+}
 
 // ─── Иконки ───────────────────────────────────────────────────────────────────
 
@@ -148,9 +198,7 @@ function WorkspaceHeader({ user }: { user: CurrentUser | null }) {
       if (
         chipRef.current && !chipRef.current.contains(e.target as Node) &&
         dropdownRef.current && !dropdownRef.current.contains(e.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
+      ) setDropdownOpen(false);
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -164,92 +212,31 @@ function WorkspaceHeader({ user }: { user: CurrentUser | null }) {
         justifyContent: 'space-between', boxSizing: 'border-box',
       }}>
         <img src={logoUrl} alt="Praktis" style={{ height: 40, width: 'auto', display: 'block' }} />
-
         {user && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <button style={{
-              width: 49, height: 49, border: 'none', background: 'transparent',
-              cursor: 'pointer', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', borderRadius: R.md, flexShrink: 0,
-            }}>
+            <button style={{ width: 49, height: 49, border: 'none', background: 'transparent', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: R.md, flexShrink: 0 }}>
               <IconNotification color="#C6D4E1" size={24} />
             </button>
-
             <div style={{ position: 'relative' }}>
-              <div
-                ref={chipRef}
-                onClick={() => setDropdownOpen(v => !v)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  background: C.bgPage, borderRadius: R.md,
-                  padding: '8px 8px 8px 10px', width: 230, height: 50,
-                  cursor: 'pointer', boxSizing: 'border-box',
-                }}
-              >
-                <div style={{
-                  width: 30, height: 30, borderRadius: R.sm, background: C.avatarBg,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: C.white, flexShrink: 0, ...font(14),
-                }}>
-                  {user.initials}
-                </div>
+              <div ref={chipRef} onClick={() => setDropdownOpen(v => !v)} style={{ display: 'flex', alignItems: 'center', gap: 8, background: C.bgPage, borderRadius: R.md, padding: '8px 8px 8px 10px', width: 230, height: 50, cursor: 'pointer', boxSizing: 'border-box' }}>
+                <div style={{ width: 30, height: 30, borderRadius: R.sm, background: C.avatarBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.white, flexShrink: 0, ...font(14) }}>{user.initials}</div>
                 <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                  <div style={{ ...font(16), color: C.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {user.fullName}
-                  </div>
-                  {user.companyName && (
-                    <div style={{ ...font(12), color: C.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {user.companyName}
-                    </div>
-                  )}
+                  <div style={{ ...font(16), color: C.textPrimary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.fullName}</div>
+                  {user.companyName && <div style={{ ...font(12), color: C.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.companyName}</div>}
                 </div>
                 <IconMoreVert color="#AABCCE" size={16} />
               </div>
-
               {dropdownOpen && (
-                <div
-                  ref={dropdownRef}
-                  style={{
-                    position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 100,
-                    background: C.white, borderRadius: R.sm, padding: 8, width: 255,
-                    boxShadow: '0px 2px 4px rgba(0,0,0,0.08), 0px -8px 8px rgba(0,0,0,0.05)',
-                    display: 'flex', flexDirection: 'column', gap: 4, boxSizing: 'border-box',
-                  }}
-                >
-                  <DropdownItem
-                    icon={(color) => <IconSwitch color={color} />}
-                    text="Заказчик/Организатор"
-                    hovered={hoveredItem === 'role'}
-                    onMouseEnter={() => setHoveredItem('role')}
-                    onMouseLeave={() => setHoveredItem(null)}
-                  />
-                  <DropdownItem
-                    icon={(color) => <IconSettings color={color} />}
-                    text="Настройки профиля"
-                    hovered={hoveredItem === 'settings'}
-                    onMouseEnter={() => setHoveredItem('settings')}
-                    onMouseLeave={() => setHoveredItem(null)}
-                  />
+                <div ref={dropdownRef} style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, zIndex: 100, background: C.white, borderRadius: R.sm, padding: 8, width: 255, boxShadow: '0px 2px 4px rgba(0,0,0,0.08), 0px -8px 8px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', gap: 4, boxSizing: 'border-box' }}>
+                  <DropdownItem icon={(c) => <IconSwitch color={c} />} text="Заказчик/Организатор" hovered={hoveredItem === 'role'} onMouseEnter={() => setHoveredItem('role')} onMouseLeave={() => setHoveredItem(null)} />
+                  <DropdownItem icon={(c) => <IconSettings color={c} />} text="Настройки профиля" hovered={hoveredItem === 'settings'} onMouseEnter={() => setHoveredItem('settings')} onMouseLeave={() => setHoveredItem(null)} />
                   <div style={{ paddingTop: 8 }}>
                     <div style={{ height: 1, background: C.borderDefault, marginBottom: 8 }} />
                     <div style={{ ...font(12), color: C.textMuted, padding: '0 12px 4px' }}>Сменить аккаунт:</div>
                   </div>
-                  <DropdownItem
-                    icon={(color) => <IconUser color={color} />}
-                    text={user.companyName || 'ООО «Сетл»'}
-                    subText="Пользователь"
-                    hovered={hoveredItem === 'company1'}
-                    onMouseEnter={() => setHoveredItem('company1')}
-                    onMouseLeave={() => setHoveredItem(null)}
-                  />
+                  <DropdownItem icon={(c) => <IconUser color={c} />} text={user.companyName || 'ООО «Сетл»'} subText="Пользователь" hovered={hoveredItem === 'company1'} onMouseEnter={() => setHoveredItem('company1')} onMouseLeave={() => setHoveredItem(null)} />
                   <div style={{ height: 1, background: C.borderDefault, margin: '4px 0' }} />
-                  <DropdownItem
-                    icon={(color) => <IconLogout color={color} />}
-                    text="Выйти"
-                    hovered={hoveredItem === 'logout'}
-                    onMouseEnter={() => setHoveredItem('logout')}
-                    onMouseLeave={() => setHoveredItem(null)}
-                  />
+                  <DropdownItem icon={(c) => <IconLogout color={c} />} text="Выйти" hovered={hoveredItem === 'logout'} onMouseEnter={() => setHoveredItem('logout')} onMouseLeave={() => setHoveredItem(null)} />
                 </div>
               )}
             </div>
@@ -264,11 +251,7 @@ function WorkspaceHeader({ user }: { user: CurrentUser | null }) {
 
 function WorkspaceFooter() {
   return (
-    <footer style={{
-      background: C.white, padding: '0 24px', height: 48,
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      flexShrink: 0, borderTop: `1px solid ${C.borderLight}`,
-    }}>
+    <footer style={{ background: C.white, padding: '0 24px', height: 48, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
       <span style={{ ...font(14), color: C.textMuted }}>© 2024. Setl Group</span>
       <div style={{ display: 'flex', gap: 60 }}>
         {['Защита персональных данных', 'Инструкция пользователя'].map(t => (
@@ -279,7 +262,7 @@ function WorkspaceFooter() {
   );
 }
 
-// ─── Данные витрины ───────────────────────────────────────────────────────────
+// ─── Витрина: данные ──────────────────────────────────────────────────────────
 
 const SERVICES = [
   { id: 'mc',      name: 'Моя компания', img: imgMiMc      },
@@ -293,57 +276,122 @@ const SERVICES = [
   { id: 'pir',     name: 'ПИР',          img: imgMiPir     },
 ];
 
-// ─── Данные каталога ИС ───────────────────────────────────────────────────────
+// ─── Каталог ИС: типы и теги ─────────────────────────────────────────────────
 
-const CATALOG_MODULES = [
+type TagType = 'free' | 'paid' | 'bim';
+
+const TAG_STYLES: Record<TagType, { label: string; bg: string; border: string; color: string }> = {
+  free: { label: 'Бесплатно',        bg: '#ebfddc', border: '#cbeead', color: '#599c1e' },
+  paid: { label: 'Платно',           bg: '#f7faff', border: '#8ab5fa', color: '#3c83f6' },
+  bim:  { label: 'AR / BIM-технология', bg: '#fff0e1', border: '#ffe5cc', color: '#ed7803' },
+};
+
+function Tag({ type }: { type: TagType }) {
+  const s = TAG_STYLES[type];
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', height: 24, padding: '0 8px', background: s.bg, border: `1px solid ${s.border}`, borderRadius: 4, alignSelf: 'flex-start', boxSizing: 'border-box' }}>
+      <span style={{ ...font(12), color: s.color }}>{s.label}</span>
+    </div>
+  );
+}
+
+// ─── Каталог ИС: данные ───────────────────────────────────────────────────────
+
+type ModuleFeature = { title: string; desc: string };
+type ModuleTariff  = { name: string; price: string; features: string[]; note: string };
+
+type CatalogModule = {
+  id: string;
+  name: string;
+  subtitle: string;
+  desc: string;
+  tag: TagType;
+  features: ModuleFeature[];
+  tariff?: ModuleTariff;
+  img: string;
+  connected: boolean;
+};
+
+const CATALOG_MODULES: CatalogModule[] = [
   {
-    id: 'objects',
-    name: 'Объекты',
-    desc: 'Сервис предоставляет пользователям информацию об объектах строительства.',
-    img: imgMiObjects,
-    connected: true,
+    id: 'objects', name: 'Объекты', subtitle: 'Управление объектами строительства', tag: 'free',
+    desc: 'Централизованный реестр строительных объектов. Храните адреса, площади, сроки и контакты — без Excel.',
+    features: [
+      { title: 'Единый реестр',       desc: 'Все объекты в одном месте'       },
+      { title: 'Быстрый поиск',       desc: 'Фильтры по статусу и адресу'     },
+      { title: 'История изменений',   desc: 'Кто и что менял'                 },
+      { title: 'Интеграция',          desc: 'Синхронизация с другими модулями' },
+    ],
+    img: imgMiObjects, connected: true,
   },
   {
-    id: 'refs',
-    name: 'Справочники',
-    desc: 'Сервис предоставляет пользователям доступ к централизованным справочникам и классификаторам.',
-    img: imgMiRefs,
-    connected: true,
+    id: 'refs', name: 'Справочники', subtitle: 'Нормативно-справочная информация', tag: 'free',
+    desc: 'Доступ к централизованным справочникам и классификаторам строительной отрасли в режиме реального времени.',
+    features: [
+      { title: 'Актуальные данные', desc: 'Обновление в реальном времени' },
+      { title: 'Классификаторы',    desc: 'ОКПД2, ОКВЭД, ОКЕИ и другие'  },
+      { title: 'Экспорт',           desc: 'В Excel и другие форматы'      },
+      { title: 'API-доступ',        desc: 'Интеграция с вашими системами' },
+    ],
+    img: imgMiRefs, connected: true,
   },
   {
-    id: 'lkk',
-    name: 'ЛКК',
-    desc: 'Личный кабинет клиента — инструмент для управления договорами и взаимодействия с застройщиком.',
-    img: imgMiLkk,
-    connected: false,
+    id: 'lkk', name: 'ЛКК', subtitle: 'Личный кабинет клиента', tag: 'paid',
+    desc: 'Инструмент для управления договорами, актами и взаимодействия с застройщиком в едином цифровом пространстве.',
+    features: [
+      { title: 'Договоры онлайн',    desc: 'Подписание без бумаги'  },
+      { title: 'Статусы объектов',   desc: 'В реальном времени'     },
+      { title: 'Чат с менеджером',   desc: 'Прямая коммуникация'    },
+      { title: 'История операций',   desc: 'Полный архив'           },
+    ],
+    tariff: { name: 'Стандарт', price: '9 000 ₽ / мес', features: ['Неограниченное число клиентов', 'Электронное подписание документов', 'Интеграция с CRM застройщика'], note: 'Оплата — после подписания. Отключить сервис можно в любой момент в разделе «Каталог ИС».' },
+    img: imgMiLkk, connected: false,
   },
   {
-    id: 'ks',
-    name: 'КС',
-    desc: 'Сервис для управления контрольными структурами и согласования документации.',
-    img: imgMiKs,
-    connected: true,
+    id: 'ks', name: 'КС', subtitle: 'Система электронного актирования', tag: 'paid',
+    desc: 'Переводит актирование в цифровой вид: формируйте КС-2, КС-3 и КС-6, согласуйте объёмы онлайн и отслеживайте выполнение по «шахматке».',
+    features: [
+      { title: 'Формы КС в пару кликов', desc: 'КС-2, КС-3, КС-6 автоматически'   },
+      { title: 'Онлайн-согласование',    desc: 'Маршруты и статусы по ролям'       },
+      { title: '«Шахматка» выполнения',  desc: 'Наглядно по секциям и этажам'      },
+      { title: 'Быстрее оплата',         desc: 'Сокращение срока согласований'     },
+    ],
+    tariff: { name: 'Стандарт', price: '18 000 ₽ / мес', features: ['Все формы КС-2, КС-3, КС-6 без ограничений', 'Онлайн-согласование и шахматка', 'Интеграция с 1С и ICONA'], note: 'Оплата — после подписания. Отключить сервис можно в любой момент в разделе «Каталог ИС».' },
+    img: imgMiKs, connected: true,
   },
   {
-    id: 'mc',
-    name: 'Моя компания',
-    desc: 'Управление профилем компании, структурой и настройками организации.',
-    img: imgMiMc,
-    connected: true,
+    id: 'mc', name: 'Моя компания', subtitle: 'Управление организацией', tag: 'free',
+    desc: 'Управление профилем, структурой и настройками компании. Добавляйте сотрудников, настраивайте роли и следите за доступами.',
+    features: [
+      { title: 'Профиль компании',  desc: 'Реквизиты и документы'        },
+      { title: 'Управление ролями', desc: 'Гибкое распределение прав'     },
+      { title: 'Сотрудники',        desc: 'Приглашение и управление'      },
+      { title: 'Безопасность',      desc: 'Журнал активности'             },
+    ],
+    img: imgMiMc, connected: true,
   },
   {
-    id: 'id',
-    name: 'ИД',
-    desc: 'Исполнительная документация — хранение и управление строительной документацией.',
-    img: imgMiId,
-    connected: true,
+    id: 'id', name: 'ИД', subtitle: 'Цифровая исполнительная документация', tag: 'bim',
+    desc: 'Хранение и управление исполнительной документацией в цифровом формате с применением BIM-технологий.',
+    features: [
+      { title: '3D-привязка',          desc: 'Документы к элементам модели' },
+      { title: 'Электронный архив',    desc: 'Всегда под рукой'             },
+      { title: 'Контроль комплектности', desc: 'Автоматическая проверка'   },
+      { title: 'Экспорт в BIM',        desc: 'IFC и другие форматы'         },
+    ],
+    img: imgMiId, connected: true,
   },
   {
-    id: 'etp',
-    name: 'ЭТП',
-    desc: 'Электронная торговая площадка для проведения закупочных процедур.',
-    img: imgMiEtp,
-    connected: false,
+    id: 'etp', name: 'ЭТП', subtitle: 'Электронная торговая площадка', tag: 'paid',
+    desc: 'Площадка для проведения конкурентных закупочных процедур: тендеры, запросы котировок, аукционы в одном окне.',
+    features: [
+      { title: 'Тендеры онлайн',          desc: 'Без бумажного документооборота' },
+      { title: 'Квалификация поставщиков', desc: 'Встроенная проверка'            },
+      { title: 'Аналитика закупок',        desc: 'Отчёты и статистика'            },
+      { title: 'Интеграция с 1С',          desc: 'Синхронизация договоров'        },
+    ],
+    tariff: { name: 'Стандарт', price: '15 000 ₽ / мес', features: ['Неограниченное число процедур', 'Квалификация и рейтинг поставщиков', 'Аналитика и отчётность'], note: 'Оплата — после подписания. Отключить сервис можно в любой момент в разделе «Каталог ИС».' },
+    img: imgMiEtp, connected: false,
   },
 ];
 
@@ -361,6 +409,142 @@ const NAV_ITEMS: { id: string; label: string; icon: string; badge?: string; clic
   { id: 'requests',          label: 'Заявки',                icon: navRequests,  badge: '15+' },
   { id: 'billing',           label: 'Биллинг',               icon: navBilling   },
 ];
+
+// ─── Модальное окно модуля ────────────────────────────────────────────────────
+
+function ModuleModal({ module: m, onClose }: { module: CatalogModule; onClose: () => void }) {
+  const [agreed, setAgreed] = useState(false);
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{ width: 700, maxWidth: '100%', maxHeight: '90vh', background: C.white, borderRadius: 20, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+      >
+        {/* ── Фиксированная шапка ── */}
+        <div style={{ flexShrink: 0, padding: '20px 28px 16px', borderBottom: `1px solid ${C.borderLight}`, display: 'flex', gap: 14, alignItems: 'flex-start', position: 'relative' }}>
+          <button
+            onClick={onClose}
+            style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <path d="M11 3L3 11M3 3L11 11" stroke="#41484a" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </button>
+          <div style={{ width: 52, height: 52, borderRadius: 10, background: C.bgPage, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <img src={m.img} alt={m.name} style={{ width: 40, height: 40, objectFit: 'contain' }} />
+          </div>
+          <div style={{ flex: 1, minWidth: 0, paddingRight: 28 }}>
+            <h2 style={{ margin: 0, ...font(22, 500), color: C.textPrimary }}>Подключение Praktis {m.name}</h2>
+            <div style={{ ...font(14), color: C.textSecondary, marginTop: 4 }}>{m.subtitle}</div>
+          </div>
+        </div>
+
+        {/* ── Скроллируемый контент ── */}
+        <div className="kit-scroll" style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '20px 8px 20px 28px' }}>
+
+          {!m.connected && (
+            <p style={{ ...font(14), color: C.textPrimary, lineHeight: 1.6, margin: '0 0 20px' }}>
+              Ознакомьтесь с возможностями, тарифом и условиями. Чтобы активировать сервис, нужно подписать документы электронной подписью.
+            </p>
+          )}
+
+          <div style={{ background: 'linear-gradient(135deg, #1a3a7a 0%, #2563eb 100%)', borderRadius: 12, padding: '28px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 150, gap: 10, marginBottom: 16 }}>
+            <div style={{ width: 52, height: 52, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M6 3.5L15 9L6 14.5V3.5Z" fill="white"/></svg>
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ ...font(13, 500), color: 'white' }}>Видеопрезентация · 2 мин</div>
+              <div style={{ ...font(12), color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>Как работать в Praktis {m.name}</div>
+            </div>
+          </div>
+
+          <div style={{ background: C.bgPage, borderRadius: 12, padding: 20, marginBottom: 12 }}>
+            <h3 style={{ margin: '0 0 8px', ...font(16, 500), color: C.textPrimary }}>Коротко о сервисе</h3>
+            <p style={{ ...font(14), color: C.textSecondary, lineHeight: 1.6, margin: '0 0 16px' }}>{m.desc}</p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              {m.features.map((f, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                  <div style={{ flexShrink: 0, marginTop: 1 }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <rect width="16" height="16" rx="3" fill="#eef3f9"/>
+                      <path d="M4 8L6.5 10.5L12 5" stroke="#3c83f6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <div style={{ ...font(13, 500), color: C.textPrimary }}>{f.title}</div>
+                    <div style={{ ...font(12), color: C.textSecondary, marginTop: 2 }}>{f.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {m.tariff && (
+            <div style={{ background: C.bgPage, borderRadius: 12, padding: 20, marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 12 }}>
+                <span style={{ ...font(16, 500), color: C.textPrimary }}>Тариф «{m.tariff.name}»</span>
+                <span style={{ ...font(20, 600), color: C.textPrimary }}>{m.tariff.price}</span>
+              </div>
+              {m.tariff.features.map((f, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7L5.5 10.5L12 3.5" stroke="#599c1e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  <span style={{ ...font(14), color: C.textPrimary }}>{f}</span>
+                </div>
+              ))}
+              <p style={{ ...font(12), color: C.textSecondary, margin: '12px 0 0', lineHeight: 1.5 }}>{m.tariff.note}</p>
+            </div>
+          )}
+
+          {/* Документы + чекбокс — только для неподключённых */}
+          {!m.connected && (
+            <>
+              <div style={{ background: C.bgPage, borderRadius: 12, padding: 20, marginBottom: 16 }}>
+                <h3 style={{ margin: '0 0 12px', ...font(16, 500), color: C.textPrimary }}>Документы для подписания</h3>
+                {['Договор-оферта на использование сервиса', 'Согласие на обработку персональных данных'].map((doc, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: i === 0 ? 8 : 0 }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                      <path d="M9 2H4C3.45 2 3 2.45 3 3V13C3 13.55 3.45 14 4 14H12C12.55 14 13 13.55 13 13V6L9 2Z" stroke="#3c83f6" strokeWidth="1.2" strokeLinejoin="round"/>
+                      <path d="M9 2V6H13" stroke="#3c83f6" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span style={{ ...font(14), color: C.primary, cursor: 'pointer' }}>{doc}</span>
+                  </div>
+                ))}
+              </div>
+
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 16 }}>
+                <div
+                  onClick={() => setAgreed(v => !v)}
+                  style={{ width: 18, height: 18, borderRadius: 4, flexShrink: 0, marginTop: 1, background: agreed ? C.primary : C.white, border: `2px solid ${agreed ? C.primary : C.borderDefault}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxSizing: 'border-box' }}
+                >
+                  {agreed && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </div>
+                <span style={{ ...font(14), color: C.textPrimary, lineHeight: 1.5 }}>
+                  Я ознакомился с обоими документами и подтверждаю согласие с их условиями
+                </span>
+              </label>
+
+              <BtnPrimary
+                onClick={undefined}
+                disabled={!agreed}
+                style={{ width: '100%', height: 48, borderRadius: R.md, ...font(14, 500), marginBottom: 12 }}
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="white" strokeWidth="1.4"/><path d="M6 9L8 11L12 7" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Подписать оба документа электронной подписью
+              </BtnPrimary>
+              <p style={{ ...font(12), color: C.textSecondary, textAlign: 'center', lineHeight: 1.5, margin: '0 0 8px' }}>
+                Оба документа подписываются одной электронной подписью. Сервис станет доступен сразу после подписания.
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── WorkspacePage ────────────────────────────────────────────────────────────
 
@@ -381,13 +565,7 @@ export default function WorkspacePage({ initialTab = 'showcase' }: { initialTab?
     <div style={{ display: 'flex', minHeight: '100vh', background: C.bgPage }}>
 
       {/* ── Sidebar ── */}
-      <div style={{
-        width: 240, flexShrink: 0,
-        background: C.white,
-        borderRadius: '0 12px 12px 0',
-        padding: '20px 12px 28px',
-        display: 'flex', flexDirection: 'column', gap: 24,
-      }}>
+      <div style={{ width: 240, flexShrink: 0, background: C.white, borderRadius: '0 12px 12px 0', padding: '20px 12px 28px', display: 'flex', flexDirection: 'column', gap: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ ...font(18, 500), color: C.textMuted }}>Моя компания</span>
           <div style={{ width: 30, height: 30, background: '#eef3f9', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -402,12 +580,7 @@ export default function WorkspacePage({ initialTab = 'showcase' }: { initialTab?
               <div
                 key={item.id}
                 onClick={item.clickable ? () => setActiveTab(item.clickable!) : undefined}
-                style={{
-                  padding: '6px 12px', borderRadius: 6,
-                  background: isActive ? C.primaryLight : C.white,
-                  display: 'flex', alignItems: 'center', gap: 8,
-                  minHeight: 46, cursor: item.clickable ? 'pointer' : 'default',
-                }}
+                style={{ padding: '6px 12px', borderRadius: 6, background: isActive ? C.primaryLight : C.white, display: 'flex', alignItems: 'center', gap: 8, minHeight: 46, cursor: item.clickable ? 'pointer' : 'default' }}
               >
                 <img
                   src={item.icon}
@@ -435,15 +608,8 @@ export default function WorkspacePage({ initialTab = 'showcase' }: { initialTab?
 
       {/* ── Правая колонка ── */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-
         <WorkspaceHeader user={user} />
-
-        {activeTab === 'showcase' ? (
-          <ShowcaseContent />
-        ) : (
-          <CatalogIsContent />
-        )}
-
+        {activeTab === 'showcase' ? <ShowcaseContent /> : <CatalogIsContent />}
         <WorkspaceFooter />
       </div>
     </div>
@@ -458,19 +624,15 @@ function ShowcaseContent() {
       <div style={{ background: C.white, borderRadius: 20, padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
         <h2 style={{ margin: 0, ...font(24, 500), color: C.textPrimary }}>Витрина сервисов</h2>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button style={{ height: 36, padding: '0 16px', background: C.buttonSecondary, border: 'none', borderRadius: 6, cursor: 'pointer', ...font(14), color: C.textPrimary }}>+ Создать группу</button>
-          <button style={{ height: 36, padding: '0 16px', background: C.primary, border: 'none', borderRadius: 6, cursor: 'pointer', ...font(14), color: C.white }}>Редактировать</button>
+          <BtnSecondary>+ Создать группу</BtnSecondary>
+          <BtnPrimary>Редактировать</BtnPrimary>
         </div>
       </div>
-
       <div style={{ background: C.white, borderRadius: 20, padding: 24 }}>
         <h3 style={{ margin: '0 0 24px', ...font(20, 500), color: C.textPrimary }}>Основные системы</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))', gap: 12 }}>
           {SERVICES.map(s => (
-            <div
-              key={s.id}
-              style={{ height: 180, background: C.bgPage, borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '24px 12px', cursor: 'pointer' }}
-            >
+            <div key={s.id} style={{ height: 180, background: C.bgPage, borderRadius: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '24px 12px', cursor: 'pointer' }}>
               <img src={s.img} alt={s.name} style={{ width: 75, height: 75, objectFit: 'contain' }} />
               <span style={{ ...font(16, 500), color: C.textPrimary, textAlign: 'center' }}>{s.name}</span>
             </div>
@@ -484,70 +646,47 @@ function ShowcaseContent() {
 // ─── Каталог ИС ───────────────────────────────────────────────────────────────
 
 function CatalogIsContent() {
+  const [activeModule, setActiveModule] = useState<CatalogModule | null>(null);
+
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 24px' }}>
-      <div style={{ ...font(14), color: C.textPrimary }}>Каталог ИС</div>
+    <>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 20, padding: '16px 24px' }}>
+        <div style={{ ...font(14), color: C.textPrimary }}>Каталог ИС</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
+          {CATALOG_MODULES.map(m => (
+            <CatalogIsCard key={m.id} module={m} onOpen={() => setActiveModule(m)} />
+          ))}
+        </div>
+      </div>
+      {activeModule && <ModuleModal module={activeModule} onClose={() => setActiveModule(null)} />}
+    </>
+  );
+}
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
-        {CATALOG_MODULES.map(m => (
-          <div
-            key={m.id}
-            style={{
-              flex: '1 0 0',
-              minWidth: 380,
-              maxWidth: 700,
-              background: C.white,
-              borderRadius: 20,
-              padding: 20,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 16,
-              boxSizing: 'border-box',
-            }}
-          >
-            <div style={{ flexShrink: 0 }}>
-              <img src={m.img} alt={m.name} style={{ width: 138, height: 138, objectFit: 'contain', display: 'block' }} />
-            </div>
-
-            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 24 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ ...font(20, 500), color: m.connected ? C.textPrimary : C.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {m.name}
-                </div>
-                <div style={{ ...font(14), color: m.connected ? C.textPrimary : C.textMuted, lineHeight: 1.4 }}>
-                  {m.desc}
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', gap: 20 }}>
-                <button style={{
-                  flex: 1, height: 36, background: C.buttonSecondary,
-                  border: 'none', borderRadius: R.sm, cursor: 'pointer',
-                  ...font(14), color: C.textPrimary,
-                }}>
-                  Подробнее
-                </button>
-                {m.connected ? (
-                  <button style={{
-                    flex: 1, height: 36, background: C.successBg,
-                    border: 'none', borderRadius: R.sm, cursor: 'pointer',
-                    ...font(14), color: C.successText,
-                  }}>
-                    Подключено
-                  </button>
-                ) : (
-                  <button style={{
-                    flex: 1, height: 36, background: C.primary,
-                    border: 'none', borderRadius: R.sm, cursor: 'pointer',
-                    ...font(14), color: C.white,
-                  }}>
-                    Подключить
-                  </button>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+function CatalogIsCard({ module: m, onOpen }: { module: CatalogModule; onOpen: () => void }) {
+  return (
+    <div style={{ background: C.white, borderRadius: 20, padding: 20, display: 'flex', alignItems: 'center', gap: 16, boxSizing: 'border-box', minHeight: 210 }}>
+      <div style={{ flexShrink: 0, alignSelf: 'center' }}>
+        <img src={m.img} alt={m.name} style={{ width: 138, height: 138, objectFit: 'contain', display: 'block' }} />
+      </div>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <Tag type={m.tag} />
+        <div style={{ ...font(20, 500), color: m.connected ? C.textPrimary : C.textMuted }}>
+          {m.name}
+        </div>
+        <div style={{ ...font(14), color: m.connected ? C.textPrimary : C.textMuted, lineHeight: 1.4, flex: 1 }}>
+          {m.desc}
+        </div>
+        <div style={{ display: 'flex', gap: 12, marginTop: 10 }}>
+          <BtnSecondary onClick={onOpen} style={{ flex: 1 }}>Подробнее</BtnSecondary>
+          {m.connected ? (
+            <button style={{ flex: 1, height: 36, background: C.successBg, border: 'none', borderRadius: R.sm, cursor: 'default', ...font(14), color: C.successText }}>
+              Подключено
+            </button>
+          ) : (
+            <BtnPrimary onClick={onOpen} style={{ flex: 1 }}>Подключить</BtnPrimary>
+          )}
+        </div>
       </div>
     </div>
   );
